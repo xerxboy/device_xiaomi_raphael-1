@@ -20,7 +20,6 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Icon;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
-
 import androidx.preference.PreferenceManager;
 
 import org.chaldeastudio.deviceparts.R;
@@ -37,39 +36,27 @@ public class DcDimmingTileService extends TileService {
     public void onStartListening() {
         super.onStartListening();
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (mSharedPrefs.getBoolean(DC_DIMMING_KEY, DC_DIMMING_DEFAULT_VALUE)) {
-            getQsTile().setIcon(Icon.createWithResource(this, R.drawable.ic_dimming_on));
-            getQsTile().setState(Tile.STATE_ACTIVE);
-        } else {
-            getQsTile().setIcon(Icon.createWithResource(this, R.drawable.ic_dimming_off));
-            getQsTile().setState(Tile.STATE_INACTIVE);
-        }
-        getQsTile().updateTile();
+        boolean state = mSharedPrefs.getBoolean(DC_DIMMING_KEY, false);
+        updateTileState(state);
     }
 
     @Override
     public void onClick() {
         super.onClick();
-        switchDcDimming(!(getQsTile().getState() == Tile.STATE_ACTIVE));
-    }
-
-    private void switchDcDimming(boolean enable) {
+        SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean enable = !(mSharedPrefs.getBoolean(DC_DIMMING_KEY, false));
+        mSharedPrefs.edit().putBoolean(DC_DIMMING_KEY, enable).apply();
         try {
             IDisplayFeature mDisplayFeature = IDisplayFeature.getService();
             mDisplayFeature.setFeature(0, 20, enable ? 1 : 0, 255);
-        } catch (Exception e) {
-            // Do nothing
-        }
+        } catch (Exception e) {}
 
-        if (enable) {
-            getQsTile().setIcon(Icon.createWithResource(this, R.drawable.ic_dimming_on));
-            getQsTile().setState(Tile.STATE_ACTIVE);
-        } else {
-            getQsTile().setIcon(Icon.createWithResource(this, R.drawable.ic_dimming_off));
-            getQsTile().setState(Tile.STATE_INACTIVE);
-        }
-        getQsTile().updateTile();
-        SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mSharedPrefs.edit().putBoolean(DC_DIMMING_KEY, enable).apply();
+        updateTileState();
+    }
+
+    private void updateTileState(boolean state) {
+        final Tile tile = getQsTile();
+        tile.setState(enabled ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE);
+        tile.updateTile();
     }
 }

@@ -81,8 +81,8 @@
 
         <service
             android:name=".display.DcDimmingTileService"
-            android:icon="@drawable/ic_dimming_off"
-            android:label="@string/dc_dimming_tile_title"
+            android:icon="@drawable/ic_dimming"
+            android:label="@string/dc_dimming_enable_title"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
