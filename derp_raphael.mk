@@ -46,3 +46,7 @@ BUILD_FINGERPRINT := google/walleye/walleye:8.1.0/OPM1.171019.021/4565141:user/r
 PRODUCT_GMS_CLIENTID_BASE := android-xiaomi
 
 $(call inherit-product, vendor/MiuiCamera/config.mk)
+
+# MIUI Camera overlay
+PRODUCT_PACKAGES += \
+    MiuiCamera-res
