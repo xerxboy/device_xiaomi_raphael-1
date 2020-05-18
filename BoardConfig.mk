@@ -46,6 +46,9 @@ TARGET_OTA_ASSERT_DEVICE := raphael,raphaelin
 TARGET_BOOTLOADER_BOARD_NAME := msmnile
 TARGET_NO_BOOTLOADER := true
 
+# Compile libhwui in performance mode
+HWUI_COMPILE_FOR_PERF := true
+
 # Kernel
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200n8 earlycon=msm_geni_serial,0xa90000 androidboot.hardware=qcom androidboot.console=ttyMSM0 service_locator.enable=1 firmware_class.path=/vendor/firmware_mnt/image loop.max_part=16 androidboot.usbcontroller=a600000.dwc3
@@ -57,14 +60,9 @@ BOARD_KERNEL_SEPARATED_DTBO := true
 TARGET_KERNEL_ARCH := arm64
 TARGET_KERNEL_CLANG_COMPILE := true
 TARGET_KERNEL_CONFIG := raphael_defconfig
-TARGET_KERNEL_SOURCE := kernel/xiaomi/raphael
-ifneq ($(wildcard prebuilts/clang/host/linux-x86/clang-avalon),)
-  TARGET_KERNEL_CLANG_VERSION := avalon
-else
-  # Find latest one
-  TARGET_KERNEL_CLANG_VERSION := $(shell sh -c "find prebuilts/clang/host/linux-x86/ -type f -name clang -printf \"%T@ %Tc %p\n\" | sort -n | tail -n1 | sed 's/.*clang-\(.*\)\/bin.*/\1/'")
-endif
-
+ifeq ($(TARGET_PREBUILT_KERNEL),)
+  TARGET_KERNEL_SOURCE := kernel/xiaomi/sm8150
+endif 
 
 # Platform
 TARGET_BOARD_PLATFORM := msmnile
