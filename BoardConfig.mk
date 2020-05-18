@@ -24,12 +24,6 @@ BUILD_BROKEN_DUP_RULES := true
 # APEX
 DEXPREOPT_GENERATE_APEX_IMAGE := true
 
-# Compile libhwui in performance mode
-HWUI_COMPILE_FOR_PERF := true
-
-# Use Snapdragon LLVM, if available
-TARGET_USE_SDCLANG := true
-
 # Architecture
 TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-2a
@@ -53,8 +47,6 @@ TARGET_BOOTLOADER_BOARD_NAME := msmnile
 TARGET_NO_BOOTLOADER := true
 
 # Kernel
-BOARD_BOOTIMG_HEADER_VERSION := 1
-BOARD_MKBOOTIMG_ARGS := --header_version $(BOARD_BOOTIMG_HEADER_VERSION)
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200n8 earlycon=msm_geni_serial,0xa90000 androidboot.hardware=qcom androidboot.console=ttyMSM0 service_locator.enable=1 firmware_class.path=/vendor/firmware_mnt/image loop.max_part=16 androidboot.usbcontroller=a600000.dwc3
 BOARD_KERNEL_IMAGE_NAME := Image.gz-dtb
@@ -63,16 +55,18 @@ BOARD_KERNEL_TAGS_OFFSET := 0x00000100
 BOARD_RAMDISK_OFFSET := 0x01000000
 BOARD_KERNEL_SEPARATED_DTBO := true
 TARGET_KERNEL_ARCH := arm64
-ifeq ($(TARGET_PREBUILT_KERNEL),)
-  TARGET_KERNEL_CONFIG := raphael_defconfig
-  TARGET_KERNEL_CLANG_COMPILE := true
-  TARGET_KERNEL_SOURCE := kernel/xiaomi/raphael
+TARGET_KERNEL_CLANG_COMPILE := true
+TARGET_KERNEL_CONFIG := raphael_defconfig
+TARGET_KERNEL_SOURCE := kernel/xiaomi/raphael
+ifneq ($(wildcard prebuilts/clang/host/linux-x86/clang-avalon),)
+  TARGET_KERNEL_CLANG_VERSION := avalon
+else
+  # Find latest one
+  TARGET_KERNEL_CLANG_VERSION := $(shell sh -c "find prebuilts/clang/host/linux-x86/ -type f -name clang -printf \"%T@ %Tc %p\n\" | sort -n | tail -n1 | sed 's/.*clang-\(.*\)\/bin.*/\1/'")
 endif
 
 
 # Platform
-BOARD_USES_QCOM_HARDWARE := true
-FORCE_QCOM_DISPLAY_HAL_VARIANT := sm8150
 TARGET_BOARD_PLATFORM := msmnile
 TARGET_BOARD_PLATFORM_GPU := qcom-adreno640
 
